@@ -1,121 +1,139 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useMemo, useState } from 'react'
+import AccountCard from './AccountCard.jsx'
+import accountsData from './Account_Sample_Data.json'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [search, setSearch] = useState('')
+  const [industry, setIndustry] = useState('all')
+  const [sortAsc, setSortAsc] = useState(true)
+
+  const industries = useMemo(() => {
+    return [...new Set(accountsData.map((account) => account.Industry))].sort()
+  }, [])
+
+  const filteredAccounts = useMemo(() => {
+    const term = search.trim().toLowerCase()
+
+    return accountsData
+      .filter((account) => account.Name.toLowerCase().includes(term))
+      .filter((account) => industry === 'all' || account.Industry === industry)
+      .sort((a, b) =>
+        sortAsc
+          ? a.Name.localeCompare(b.Name)
+          : b.Name.localeCompare(a.Name),
+      )
+  }, [search, industry, sortAsc])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app">
+      <nav className="topbar">
+        <div className="topbar__inner">
+          <div className="topbar__brand">
+            <span className="topbar__logo" aria-hidden="true">
+              🏢
+            </span>
+            <span className="topbar__title">Account Explorer</span>
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+      </nav>
+
+      <main className="canvas">
+        <header className="page-header">
+          <h1 className="page-header__title">Explorar Cuentas</h1>
+          <p className="page-header__subtitle">
+            Gestione y filtre el directorio de empresas corporativas.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        </header>
 
-      <div className="ticks"></div>
+        <section className="controls">
+          <div className="control control--search">
+            <label className="control__label" htmlFor="search-account">
+              Buscar por nombre
+            </label>
+            <div className="control__input-wrap">
+              <span className="control__input-icon" aria-hidden="true">
+                🔍
+              </span>
+              <input
+                id="search-account"
+                type="text"
+                className="control__input"
+                placeholder="Escribe el nombre de una cuenta"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className="control">
+            <label className="control__label" htmlFor="filter-industry">
+              Filtrar por industria
+            </label>
+            <select
+              id="filter-industry"
+              className="control__select"
+              value={industry}
+              onChange={(event) => setIndustry(event.target.value)}
+            >
+              <option value="all">Todas las industrias</option>
+              {industries.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <div className="control control--sort">
+            <span className="control__label">Ordenar</span>
+            <button
+              type="button"
+              className="control__sort-btn"
+              onClick={() => setSortAsc((value) => !value)}
+            >
+              <span aria-hidden="true">{sortAsc ? '↑' : '↓'}</span>
+              <span>Orden: {sortAsc ? 'A-Z' : 'Z-A'}</span>
+            </button>
+          </div>
+        </section>
+
+        <div className="results-bar">
+          <span className="results-bar__count">
+            Mostrando {filteredAccounts.length} de {accountsData.length} cuentas
+          </span>
+        </div>
+
+        {filteredAccounts.length > 0 ? (
+          <div className="account-grid">
+            {filteredAccounts.map((account) => (
+              <AccountCard key={account.Id} account={account} />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span className="empty-state__icon" aria-hidden="true">
+              🔎
+            </span>
+            <h3 className="empty-state__title">No se encontraron cuentas</h3>
+            <p className="empty-state__text">
+              Intente ajustar sus filtros de búsqueda o pruebe con un nombre
+              diferente para encontrar la cuenta que busca.
+            </p>
+            <button
+              type="button"
+              className="empty-state__btn"
+              onClick={() => {
+                setSearch('')
+                setIndustry('all')
+              }}
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        )}
+      </main>
+    </div>
   )
 }
 
