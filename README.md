@@ -1,58 +1,189 @@
-# Salesforce DX Project
+# Account Explorer — Professional Readiness Sprint
 
-Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
+Repositorio individual que reúne **dos implementaciones** del mismo caso de uso —
+un directorio de cuentas corporativas con búsqueda, filtro por industria y
+ordenamiento— construidas sobre plataformas distintas:
 
-This project template gets you started with the tools and structure you need to build Salesforce applications using source control, scratch orgs, and the Salesforce CLI.
+1. **Salesforce (LWC + Apex)** — El componente `accountExplorer` consume datos
+   reales de la org vía un controlador Apex (`AccountController`) que ejecuta una
+   consulta SOQL sobre el objeto `Account`.
+2. **React local (`react-account-explorer`)** — Una SPA construida con Vite que
+   replica la misma experiencia de usuario, pero se alimenta de un archivo de
+   datos estático (`Account_Sample_Data.json`), **sin llamadas a APIs externas**.
 
-## Prerequisites
+El objetivo del sprint es demostrar dominio del stack de desarrollo de Salesforce
+(Salesforce DX, LWC, Apex, SOQL) y del desarrollo front-end moderno (React, Vite),
+manteniendo paridad funcional entre ambas soluciones.
 
-Before you start, make sure you have:
+---
 
-- **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
-- **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
-- **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub.  See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+## Requisitos Previos
 
-## Project Structure
+Instala las siguientes herramientas antes de comenzar. Las versiones indicadas son
+las recomendadas y validadas para este proyecto.
 
-Your DX project follows this structure:
+| Herramienta | Versión recomendada | Notas |
+|-------------|---------------------|-------|
+| **Node.js** | `>= 20 LTS` | Requerido por Vite 8 y las herramientas de LWC. |
+| **npm** | `>= 10` | Se instala junto con Node.js. |
+| **Salesforce CLI (`sf`)** | `>= 2.x` (última estable) | Descarga: [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). Verifica con `sf --version`. |
+| **VS Code** | Última estable | Con el **Salesforce Extension Pack** (incluye Agentforce Vibes). |
+| **Org de Salesforce** | Developer Edition o Sandbox | [Regístrate gratis](https://developer.salesforce.com/signup) si no cuentas con una. |
 
-- **`force-app/main/default/`** - Your metadata source files live in this default package directory. You can configure additional package directories in the `sfdx-project.json` file.
-- **`config/`** - Scratch org definitions and project settings
-- **`scripts/`** - Automation scripts for common tasks
-- **`sfdx-project.json`** - Project manifest that defines package directories, namespace, API version, and other project-level settings
+> El proyecto usa **API version `67.0`** (definida en `sfdx-project.json` y en el
+> `.js-meta.xml` del LWC). Asegúrate de que tu org soporte esta versión.
 
-See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm).
+---
 
-## Get Started
+## Estructura del Repositorio
 
-Ready to start developing? The [Get Started with Salesforce DX](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_get_started_dx.htm) guide walks you through your first project, from creating a scratch org to creating a simple Apex class or LWC to deploying your code to a sandbox.
+El repositorio separa claramente ambos proyectos: el código de Salesforce vive en
+`/force-app`, mientras que la aplicación React es autónoma en
+`/react-account-explorer`.
 
-## Common Salesforce CLI Commands
+```
+AccountExplorer/
+├── force-app/                          # ── Proyecto Salesforce DX ──
+│   └── main/default/
+│       ├── classes/
+│       │   ├── AccountController.cls           # Controlador Apex (SOQL)
+│       │   ├── AccountController.cls-meta.xml
+│       │   ├── AccountControllerTest.cls       # Pruebas unitarias Apex
+│       │   └── AccountControllerTest.cls-meta.xml
+│       └── lwc/
+│           └── accountExplorer/                # Lightning Web Component
+│               ├── accountExplorer.js
+│               ├── accountExplorer.html
+│               ├── accountExplorer.css
+│               └── accountExplorer.js-meta.xml
+│
+├── react-account-explorer/             # ── Aplicación React (Vite) ──
+│   ├── src/
+│   │   ├── App.jsx                             # Componente raíz + lógica de filtro
+│   │   ├── AccountCard.jsx                     # Tarjeta de cuenta individual
+│   │   ├── Account_Sample_Data.json            # Datos estáticos (sin API)
+│   │   ├── App.css / index.css
+│   │   └── main.jsx
+│   ├── public/
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
+│
+├── config/                             # Definiciones de scratch org
+├── manifest/                           # package.xml para despliegues selectivos
+├── scripts/                            # Scripts Apex y SOQL de apoyo
+├── sfdx-project.json                   # Manifiesto del proyecto Salesforce DX
+└── package.json                        # Tooling raíz (lint, prettier, jest)
+```
 
-Here are common CLI commands that you'll use the most:
+---
 
-- `sf org login web`: Authorize an org
-- `sf org open`: Open your org in a browser
-- `sf org create scratch`: Create a scratch org
-- `sf project deploy start`: Deploy metadata to your org
-- `sf project retrieve start`: Retrieve metadata from your org
-- `sf template generate <artifact>`: Scaffold new components, such as Apex classes and triggers, LWC components, Lightning apps, and more
-- `sf apex <command>`: Run Apex tests, run anonymous Apex blocks, and view logs
-- `sf data <command>`: Work with test data
-- `sf alias <command>`: Manage org aliases
-- `sf config <command>`: Configure CLI settings
+## Guía de Instalación y Ejecución — Salesforce
 
-## Use Agentforce Vibes to Build Lightning Apps
+### 1. Autenticar la org
 
-Transform your ideas into custom Lightning apps that extend CRM workflows directly in Lightning Experience. Through natural conversations with Agentforce Vibes, implement custom objects and fields, complex business logic, and dynamic UI components. See [Build a Lightning App Using Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/lexapp-overview.html).
+Autoriza tu org de desarrollo o sandbox mediante el flujo web. Se abrirá el
+navegador para que inicies sesión.
 
-## Additional Resources
+```bash
+sf org login web --alias AccountExplorerOrg --set-default
+```
 
-- [Agentforce Vibes Developer Guide](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/einstein-overview.html)
-- [Salesforce CLI Installation Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/)
-- [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
-- [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
+- `--alias` asigna un nombre corto reutilizable a la conexión.
+- `--set-default` la establece como la org por defecto del proyecto.
 
+### 2. Desplegar el código fuente a la org
+
+Despliega todo el contenido de `force-app` (Apex + LWC) a la org autenticada.
+
+```bash
+sf project deploy start --source-dir force-app
+```
+
+> Para desplegar todo el proyecto por defecto, basta con `sf project deploy start`.
+
+### 3. Verificar la consulta SOQL de Cuentas
+
+El componente se alimenta de la misma consulta que ejecuta `AccountController`.
+Puedes validar que la org devuelve datos ejecutando la SOQL directamente desde la
+CLI:
+
+```bash
+sf data query --query "SELECT Id, Name, Industry, Phone FROM Account ORDER BY Name"
+```
+
+Si tu org no tiene cuentas, importa datos de ejemplo o crea algunas cuentas de
+prueba antes de abrir el componente.
+
+### 4. Agregar el LWC a una Lightning Page
+
+El componente `accountExplorer` está expuesto (`isExposed = true`) para
+`AppPage`, `HomePage` y `RecordPage`. Para colocarlo en una página:
+
+1. En tu org, ve a **Setup → Lightning App Builder** (o edita cualquier página
+   Lightning existente con el ícono de engranaje → *Edit Page*).
+2. Crea o abre una página de tipo **App Page**, **Home Page** o **Record Page**.
+3. En el panel de componentes de la izquierda, busca **"Account Explorer"** bajo
+   la sección de componentes personalizados (Custom).
+4. **Arrastra y suelta** el componente en la región deseada del lienzo.
+5. Haz clic en **Save** y luego en **Activate** para asignar la página a una app,
+   perfil o como página por defecto.
+
+---
+
+## Guía de Instalación y Ejecución — React
+
+La aplicación React es completamente independiente de Salesforce.
+
+### 1. Navegar e instalar dependencias
+
+```bash
+cd react-account-explorer
+pnpm install
+```
+
+### 2. Ejecutar el servidor de desarrollo local
+
+```bash
+pnpm run dev
+```
+
+Vite levantará el servidor (por defecto en `http://localhost:5173`). Abre esa URL
+en el navegador para ver la aplicación con recarga en caliente (HMR).
+
+Otros comandos disponibles:
+
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm run dev` | Servidor de desarrollo con HMR. |
+| `pnpm run build` | Compila la versión de producción en `dist/`. |
+| `pnpm run preview` | Sirve localmente el build de producción. |
+| `pnpm run lint` | Analiza el código con **oxlint**. |
+
+### 3. Consumo de datos estáticos (sin APIs externas)
+
+A diferencia de la versión LWC —que consulta la org vía Apex/SOQL— la aplicación
+React **no realiza ninguna llamada de red**. En su lugar:
+
+- El archivo `src/Account_Sample_Data.json` contiene un arreglo de cuentas con la
+  misma forma que devuelve la SOQL: `Id`, `Name`, `Industry` y `Phone`.
+- `App.jsx` **importa el JSON directamente** como un módulo
+  (`import accountsData from './Account_Sample_Data.json'`), por lo que Vite lo
+  empaqueta en tiempo de compilación.
+- Toda la lógica de búsqueda, filtrado por industria y ordenamiento se ejecuta en
+  memoria en el cliente mediante hooks (`useMemo`, `useState`).
+
+Esto hace que la app sea totalmente portátil y ejecutable sin conexión ni
+credenciales, ideal para demostraciones offline.
+
+---
+
+## Autoría y Licencia / Aviso
+
+- **Estudiante:** _[Escribe aquí tu nombre completo]_
+- **Pod de soporte:** _[Escribe aquí tu pod / cohorte]_
+- **Programa:** Professional Readiness Sprint — Account Explorer
+
+> Este repositorio se entrega con fines educativos como parte del sprint de
+> preparación profesional. El uso de asistentes de IA durante su desarrollo está
+> documentado de forma transparente en [`AI_WORK_LOG.md`](./AI_WORK_LOG.md).
