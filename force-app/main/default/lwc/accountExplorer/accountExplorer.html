@@ -1,0 +1,74 @@
+<template>
+    <lightning-card title="Account Explorer" icon-name="standard:account">
+        <div class="slds-p-around_medium">
+            <lightning-layout multiple-rows vertical-align="end" class="slds-gutters slds-m-bottom_medium">
+                <lightning-layout-item size="12" medium-device-size="5" large-device-size="5">
+                    <lightning-input
+                        type="search"
+                        label="Buscar por nombre"
+                        value={searchKey}
+                        onchange={handleSearchChange}
+                        placeholder="Escribe el nombre de una cuenta">
+                    </lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" medium-device-size="4" large-device-size="4">
+                    <lightning-combobox
+                        label="Filtrar por industria"
+                        value={selectedIndustry}
+                        options={industryOptions}
+                        onchange={handleIndustryChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" medium-device-size="3" large-device-size="3">
+                    <lightning-button
+                        label={sortButtonLabel}
+                        title="Alternar orden"
+                        onclick={handleSortToggle}
+                        class="slds-m-top_small">
+                    </lightning-button>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <template if:true={isLoading}>
+                <div class="slds-is-relative slds-p-vertical_large">
+                    <lightning-spinner alternative-text="Cargando cuentas" size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={hasError}>
+                <div class="slds-box slds-theme_error slds-m-bottom_medium" role="alert">
+                    <p>{errorMessage}</p>
+                </div>
+            </template>
+
+            <template if:true={showEmptyState}>
+                <div class="slds-box slds-theme_default slds-text-align_center slds-p-around_large">
+                    <p class="slds-text-heading_small slds-m-bottom_x-small">No encontramos cuentas</p>
+                    <p class="slds-text-body_regular">Prueba con otro término de búsqueda o ajusta el filtro de industria.</p>
+                </div>
+            </template>
+
+            <template if:true={hasAccounts}>
+                <lightning-layout multiple-rows class="slds-gutters">
+                    <template for:each={filteredAccounts} for:item="account">
+                        <lightning-layout-item key={account.Id} size="12" medium-device-size="6" large-device-size="4">
+                            <div class="slds-box slds-theme_default slds-p-around_medium slds-m-bottom_small">
+                                <p class="slds-text-heading_small slds-truncate" title={account.Name}>{account.Name}</p>
+                                <p class="slds-text-body_regular slds-m-top_x-small">
+                                    <span class="slds-text-title_bold">Industria:</span>
+                                    <span class="slds-m-left_x-small">{account.IndustryDisplay}</span>
+                                </p>
+                                <p class="slds-text-body_regular slds-m-top_x-small">
+                                    <span class="slds-text-title_bold">Teléfono:</span>
+                                    <span class="slds-m-left_x-small">{account.PhoneDisplay}</span>
+                                </p>
+                            </div>
+                        </lightning-layout-item>
+                    </template>
+                </lightning-layout>
+            </template>
+        </div>
+    </lightning-card>
+</template>
