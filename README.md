@@ -180,8 +180,7 @@ credenciales, ideal para demostraciones offline.
 
 ## Autoría y Licencia / Aviso
 
-- **Estudiante:** _[Escribe aquí tu nombre completo]_
-- **Pod de soporte:** _[Escribe aquí tu pod / cohorte]_
+- **Estudiante:** Jareth Jaziel Moo Pan
 - **Programa:** Professional Readiness Sprint — Account Explorer
 
 > Este repositorio se entrega con fines educativos como parte del sprint de
