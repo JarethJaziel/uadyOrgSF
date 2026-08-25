@@ -26,15 +26,15 @@
 
 ### Capturas de Pantalla de las Asignaciones / Módulos Completados
 
-#### Asignación 1: Fundamentos / Apex / LWC
+#### Asignación 1: Headless 360
 ![Asignación 1 - Trailhead Completion](./assets/trailhead_assignment_1.png)
 *Descripción: Captura donde se visualiza la finalización del módulo/proyecto 1.*
 
-#### Asignación 2: Lightning Web Components / Integración
+#### Asignación 2: Quick Start: VsCode
 ![Asignación 2 - Trailhead Completion](./assets/trailhead_assignment_2.png)
 *Descripción: Captura donde se visualiza la finalización del módulo/proyecto 2.*
 
-#### Asignación 3: Desarrollo Front-End / Proyecto Integral
+#### Asignación 3: Quick Start: LWC
 ![Asignación 3 - Trailhead Completion](./assets/trailhead_assignment_3.png)
 *Descripción: Captura donde se visualiza la finalización del módulo/proyecto 3.*
 
@@ -79,7 +79,7 @@
 ![Org Conectada en Salesforce CLI](./assets/sf_org_connected.png)
 ```bash
 # Comando de verificación ejecutado:
-sf org display
+sf org list
 ```
 
 ### 4.2 Consulta SOQL de Cuentas (`sf data query`)
