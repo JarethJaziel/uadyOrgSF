@@ -1,5 +1,8 @@
 # Account Explorer — Professional Readiness Sprint
 
+> 📁 **Evidencias del Sprint:** Consulta las capturas, demos en GIF, perfil de Trailhead y checklist de entrega en [`evidence/README.md`](./evidence/README.md).  
+> 🤖 **Bitácora de IA:** Registro de herramientas, prompts y correcciones en [`AI_WORK_LOG.md`](./AI_WORK_LOG.md).
+
 Repositorio individual que reúne **dos implementaciones** del mismo caso de uso —
 un directorio de cuentas corporativas con búsqueda, filtro por industria y
 ordenamiento— construidas sobre plataformas distintas:
